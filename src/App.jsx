@@ -2,14 +2,31 @@ import SearchBar from './components/SearchBar/SearchBar';
 import ImageGallery from './components/ImageGallery/ImageGallery';
 import Loader from './components/Loader/Loader';
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
+import ImageModal from './components/ImageModal/ImageModal';
 import { fetchImages } from '../unsplash-api';
 import { useState, useEffect } from 'react';
+import ReactModal from 'react-modal';
+
+ReactModal.setAppElement(document.getElementById('root'));
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
 
 function App() {
   const [query, setQuery] = useState('');
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [modalUrl, setModalUrl] = useState('');
 
   const handleSearch = async query => {
     setQuery(query);
@@ -28,14 +45,35 @@ function App() {
     setIsLoading(false);
   };
 
+  const openModal = url => {
+    setModalUrl(url);
+    setIsOpen(true);
+  };
+
+  const afterOpenModal = () => {};
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
   return (
     <>
       <SearchBar onSearch={handleSearch} />
-      {images.length > 0 && <ImageGallery images={images} />}
+      {images.length > 0 && (
+        <ImageGallery images={images} openModal={openModal} />
+      )}
       {images.length > 0 && !isLoading && (
         <LoadMoreBtn onClick={handleLoadMore} />
       )}
       {isLoading && <Loader />}
+      <ReactModal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+      >
+        <ImageModal modalUrl={modalUrl} />
+      </ReactModal>
     </>
   );
 }
