@@ -15,7 +15,7 @@ const ImageCard = ({ url, description, author, likes }) => {
       }}
     >
       <img src={url} alt={description} width={360} height={200} />
-      <div>
+      <div className={css.descriptionWrapper}>
         <p className={css.author}>Author: {author}</p>
         <p className={css.likes}>Likes: {likes}</p>
         {isHovered && description && <p>Description: {description}</p>}

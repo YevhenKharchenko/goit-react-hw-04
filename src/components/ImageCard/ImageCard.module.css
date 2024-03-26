@@ -1,6 +1,10 @@
 .imageCard {
 }
 
+.descriptionWrapper {
+  padding: 6px;
+}
+
 .author {
   font-size: 10px;
 }

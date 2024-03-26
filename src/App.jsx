@@ -29,31 +29,47 @@ function App() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
   const [error, setError] = useState(false);
+  const [showBtn, setShowBtn] = useState(false);
 
   const handleSearch = async query => {
-    setError(false);
-    setImages([]);
-    setQuery(query);
-    setIsLoading(true);
-    const fetchedImages = await fetchImages(query, 1);
+    try {
+      setError(false);
+      setImages([]);
+      setQuery(query);
+      setIsLoading(true);
+      const fetchedImages = await fetchImages(query, 1);
+      const totalPages = fetchedImages.total_pages;
 
-    if (!fetchedImages.results.length) {
+      if (!fetchedImages.results.length) {
+        setIsLoading(false);
+        alert('Sorry, there are no such images!');
+        return;
+      }
+
+      setImages(fetchedImages.results);
+      setShowBtn(totalPages > page);
+      setPage(2);
+    } catch (error) {
       setError(true);
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    setImages(fetchedImages.results);
-    setPage(2);
-    setIsLoading(false);
   };
 
   const handleLoadMore = async () => {
-    setIsLoading(true);
-    const moreFetchedImages = await fetchImages(query, page);
-    setPage(p => p + 1);
-    setImages([...images, ...moreFetchedImages.results]);
-    setIsLoading(false);
+    try {
+      setError(false);
+      setIsLoading(true);
+      const moreFetchedImages = await fetchImages(query, page);
+      const totalPages = moreFetchedImages.total_pages;
+      setShowBtn(totalPages > page);
+      setPage(p => p + 1);
+      setImages([...images, ...moreFetchedImages.results]);
+    } catch (error) {
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const openModal = url => {
@@ -75,7 +91,7 @@ function App() {
       ) : (
         error && <ErrorMessage />
       )}
-      {images.length > 0 && !isLoading && (
+      {images.length > 0 && !isLoading && showBtn && (
         <LoadMoreBtn onClick={handleLoadMore} />
       )}
       {isLoading && <Loader />}
