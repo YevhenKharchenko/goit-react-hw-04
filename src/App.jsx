@@ -3,6 +3,7 @@ import ImageGallery from './components/ImageGallery/ImageGallery';
 import Loader from './components/Loader/Loader';
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import ImageModal from './components/ImageModal/ImageModal';
+import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import { fetchImages } from '../unsplash-api';
 import { useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
@@ -27,11 +28,21 @@ function App() {
   const [page, setPage] = useState(1);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
+  const [error, setError] = useState(false);
 
   const handleSearch = async query => {
+    setError(false);
+    setImages([]);
     setQuery(query);
     setIsLoading(true);
     const fetchedImages = await fetchImages(query, 1);
+
+    if (!fetchedImages.results.length) {
+      setError(true);
+      setIsLoading(false);
+      return;
+    }
+
     setImages(fetchedImages.results);
     setPage(2);
     setIsLoading(false);
@@ -59,8 +70,10 @@ function App() {
   return (
     <>
       <SearchBar onSearch={handleSearch} />
-      {images.length > 0 && (
+      {images.length > 0 && !error ? (
         <ImageGallery images={images} openModal={openModal} />
+      ) : (
+        error && <ErrorMessage />
       )}
       {images.length > 0 && !isLoading && (
         <LoadMoreBtn onClick={handleLoadMore} />

@@ -5,4 +5,19 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 30px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.listItem {
+  cursor: zoom-in;
+  width: 360px;
+  border: 1px solid #111;
+  border-radius: 4px;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.listItem:hover,
+.listItem:focus {
+  transform: scale(1.07);
 }

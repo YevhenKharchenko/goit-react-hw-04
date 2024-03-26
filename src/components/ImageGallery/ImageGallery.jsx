@@ -7,12 +7,18 @@ const ImageGallery = ({ images, openModal }) => {
       {images.map(el => {
         return (
           <li
+            className={css.listItem}
             key={el.id}
             onClick={() => {
               openModal(el.urls.regular);
             }}
           >
-            <ImageCard url={el.urls.small} description={el.description} />
+            <ImageCard
+              url={el.urls.small}
+              description={el.description}
+              author={el.user.name}
+              likes={el.likes}
+            />
           </li>
         );
       })}
