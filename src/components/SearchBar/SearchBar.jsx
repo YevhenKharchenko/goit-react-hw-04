@@ -8,17 +8,7 @@ const SearchBar = ({ onSearch }) => {
     const query = form.elements.query.value;
 
     if (!query.trim().length) {
-      toast.error('Input field is empty. Please provide a value.', {
-        style: {
-          // border: '1px solid black',
-          padding: '16px',
-          color: '',
-        },
-        iconTheme: {
-          primary: '',
-          secondary: '',
-        },
-      });
+      toast.error('Input field is empty. Please provide a value.');
 
       return;
     }

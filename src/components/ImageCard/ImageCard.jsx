@@ -18,7 +18,9 @@ const ImageCard = ({ url, description, author, likes }) => {
       <div className={css.descriptionWrapper}>
         <p className={css.author}>Author: {author}</p>
         <p className={css.likes}>Likes: {likes}</p>
-        {isHovered && description && <p>Description: {description}</p>}
+        {isHovered && description && (
+          <p className={css.description}>Description: {description}</p>
+        )}
       </div>
     </div>
   );

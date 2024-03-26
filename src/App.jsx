@@ -5,19 +5,25 @@ import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import ImageModal from './components/ImageModal/ImageModal';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import { fetchImages } from '../unsplash-api';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ReactModal from 'react-modal';
+import toast from 'react-hot-toast';
 
 ReactModal.setAppElement(document.getElementById('root'));
 
 const customStyles = {
   content: {
+    padding: '0',
     top: '50%',
     left: '50%',
     right: 'auto',
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
+    color: 'lightsteelblue',
+  },
+  overlay: {
+    backgroundColor: 'rgba(46, 47, 66, 0.8)',
   },
 };
 
@@ -42,7 +48,10 @@ function App() {
 
       if (!fetchedImages.results.length) {
         setIsLoading(false);
-        alert('Sorry, there are no such images!');
+        toast.error(
+          'Sorry, there are no images matching your search query. Please, try again!'
+        );
+
         return;
       }
 
@@ -64,7 +73,7 @@ function App() {
       const totalPages = moreFetchedImages.total_pages;
       setShowBtn(totalPages > page);
       setPage(p => p + 1);
-      setImages([...images, ...moreFetchedImages.results]);
+      setImages(images => [...images, ...moreFetchedImages.results]);
     } catch (error) {
       setError(true);
     } finally {
