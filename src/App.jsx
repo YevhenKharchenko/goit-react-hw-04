@@ -4,28 +4,9 @@ import Loader from './components/Loader/Loader';
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import ImageModal from './components/ImageModal/ImageModal';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage';
-import { requestImages } from '../unsplash-api';
+import { requestImages } from './services/unsplash-api';
 import { useState, useEffect, useRef } from 'react';
-import ReactModal from 'react-modal';
 import toast from 'react-hot-toast';
-
-ReactModal.setAppElement(document.getElementById('root'));
-
-const customStyles = {
-  content: {
-    padding: '0',
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    color: 'lightsteelblue',
-  },
-  overlay: {
-    backgroundColor: 'rgba(46, 47, 66, 0.8)',
-  },
-};
 
 function App() {
   const [query, setQuery] = useState('');
@@ -78,9 +59,9 @@ function App() {
   }, [images]);
 
   const handleSearch = async query => {
+    setImages([]);
     setError(false);
     setShowBtn(false);
-    setImages([]);
     setQuery(query);
     setPage(1);
   };
@@ -93,8 +74,6 @@ function App() {
     setModalUrl(url);
     setIsOpen(true);
   };
-
-  const afterOpenModal = () => {};
 
   const closeModal = () => {
     setIsOpen(false);
@@ -116,14 +95,11 @@ function App() {
         <LoadMoreBtn onClick={handleLoadMore} />
       )}
       {isLoading && <Loader />}
-      <ReactModal
-        isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
-        onRequestClose={closeModal}
-        style={customStyles}
-      >
-        <ImageModal modalUrl={modalUrl} />
-      </ReactModal>
+      <ImageModal
+        modalUrl={modalUrl}
+        modalIsOpen={modalIsOpen}
+        closeModal={closeModal}
+      />
     </>
   );
 }
