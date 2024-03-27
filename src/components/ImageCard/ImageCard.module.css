@@ -1,6 +1,11 @@
 .imageCard {
 }
 
+.imageCard:hover .description,
+.imageCard:focus .description {
+  display: block;
+}
+
 .descriptionWrapper {
   padding: 6px;
   background-color: #f5f5f5;
@@ -15,4 +20,5 @@
 }
 
 .description {
+  display: none;
 }

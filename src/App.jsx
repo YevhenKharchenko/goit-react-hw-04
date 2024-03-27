@@ -4,8 +4,8 @@ import Loader from './components/Loader/Loader';
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 import ImageModal from './components/ImageModal/ImageModal';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage';
-import { fetchImages } from '../unsplash-api';
-import { useState } from 'react';
+import { requestImages } from '../unsplash-api';
+import { useState, useEffect, useRef } from 'react';
 import ReactModal from 'react-modal';
 import toast from 'react-hot-toast';
 
@@ -36,49 +36,57 @@ function App() {
   const [modalUrl, setModalUrl] = useState('');
   const [error, setError] = useState(false);
   const [showBtn, setShowBtn] = useState(false);
+  const lastPhotoRef = useRef(null);
+
+  useEffect(() => {
+    async function fetchImages() {
+      if (!query.length) return;
+
+      try {
+        setIsLoading(true);
+        const fetchedImages = await requestImages(query, page);
+        const totalPages = fetchedImages.total_pages;
+
+        if (!fetchedImages.results.length) {
+          setIsLoading(false);
+          toast.error(
+            'Sorry, there are no images matching your search query. Please, try again!'
+          );
+
+          return;
+        }
+
+        setImages(images => [...images, ...fetchedImages.results]);
+        setShowBtn(totalPages > page);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchImages();
+  }, [query, page]);
+
+  useEffect(() => {
+    if (!lastPhotoRef.current) return;
+
+    lastPhotoRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+    });
+  }, [images]);
 
   const handleSearch = async query => {
-    try {
-      setError(false);
-      setImages([]);
-      setQuery(query);
-      setIsLoading(true);
-      const fetchedImages = await fetchImages(query, 1);
-      const totalPages = fetchedImages.total_pages;
-
-      if (!fetchedImages.results.length) {
-        setIsLoading(false);
-        toast.error(
-          'Sorry, there are no images matching your search query. Please, try again!'
-        );
-
-        return;
-      }
-
-      setImages(fetchedImages.results);
-      setShowBtn(totalPages > page);
-      setPage(2);
-    } catch (error) {
-      setError(true);
-    } finally {
-      setIsLoading(false);
-    }
+    setError(false);
+    setShowBtn(false);
+    setImages([]);
+    setQuery(query);
+    setPage(1);
   };
 
   const handleLoadMore = async () => {
-    try {
-      setError(false);
-      setIsLoading(true);
-      const moreFetchedImages = await fetchImages(query, page);
-      const totalPages = moreFetchedImages.total_pages;
-      setShowBtn(totalPages > page);
-      setPage(p => p + 1);
-      setImages(images => [...images, ...moreFetchedImages.results]);
-    } catch (error) {
-      setError(true);
-    } finally {
-      setIsLoading(false);
-    }
+    setPage(p => p + 1);
   };
 
   const openModal = url => {
@@ -96,7 +104,11 @@ function App() {
     <>
       <SearchBar onSearch={handleSearch} />
       {images.length > 0 && !error ? (
-        <ImageGallery images={images} openModal={openModal} />
+        <ImageGallery
+          images={images}
+          openModal={openModal}
+          ref={lastPhotoRef}
+        />
       ) : (
         error && <ErrorMessage />
       )}
