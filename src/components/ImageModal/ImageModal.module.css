@@ -19,4 +19,5 @@
   right: 0;
   bottom: 0;
   background-color: rgba(46, 47, 66, 0.8);
+  z-index: 1;
 }
